@@ -3,97 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flash Tracking | Istanbul-Germany</title>
+<title>Flash Tracking</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-    /* Plane Animation Styling */
-    .plane-track { height: 4px; background: rgba(255,255,255,0.1); position: relative; border-radius: 10px; margin: 40px 0; }
-    .plane { 
-        position: absolute; top: -15px; left: 0%; 
-        transition: left 3s ease-in-out; 
-        font-size: 24px; filter: drop-shadow(0 0 5px #3b82f6);
-    }
+.track-line {
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  position: relative;
+  margin: 50px 0;
+}
+.plane {
+  position: absolute;
+  top: -18px;
+  left: 0%;
+  transition: left 1.5s cubic-bezier(0.4,0,0.2,1);
+  font-size: 24px;
+  text-shadow: 0 0 10px #3b82f6;
+}
 </style>
 </head>
-<body class="bg-[#0a0f1d] font-sans text-white">
 
-    <nav class="p-6 border-b border-white/10">
-        <div class="text-2xl font-black italic text-blue-500 uppercase tracking-tighter">Flash Tracking</div>
-    </nav>
+<body class="bg-[#050a15] text-white font-sans">
 
-    <header class="py-16 px-6 text-center">
-        <h1 class="text-4xl font-extrabold mb-4">Track Your Shipment</h1>
-        <p class="text-slate-400 mb-10 text-sm tracking-widest uppercase">Istanbul (TR) ➔ Germany (DE)</p>
-        
-        <div class="max-w-md mx-auto flex bg-white p-2 rounded-2xl shadow-2xl">
-            <input id="trackInput" type="text" placeholder="Enter ID (57536986)" class="flex-grow p-4 text-slate-900 outline-none rounded-l-xl font-mono">
-            <button onclick="runTrack()" class="bg-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg">Track</button>
-        </div>
+<nav class="p-6 border-b border-white/5">
+  <div class="text-2xl font-black italic text-blue-500 uppercase">
+    Flash Tracking
+  </div>
+</nav>
 
-        <div id="resultBox" class="mt-10 max-w-lg mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl text-left hidden border border-white/10 shadow-2xl">
-            
-            <div class="plane-track">
-                <div id="planeIcon" class="plane">✈️</div>
-                <div class="flex justify-between mt-6 text-[10px] font-bold uppercase text-blue-400 tracking-widest">
-                    <span>Istanbul</span>
-                    <span>In Transit</span>
-                    <span>Germany</span>
-                </div>
-            </div>
+<header class="py-16 px-6 text-center">
+  <h2 class="text-3xl font-bold mb-8">Shipment Tracker</h2>
 
-            <div class="grid grid-cols-2 gap-4 mt-10">
-                <div>
-                    <p class="text-xs uppercase text-slate-400 font-bold mb-1">Status</p>
-                    <h3 id="statusText" class="text-lg font-bold"></h3>
-                </div>
-                <div>
-                    <p class="text-xs uppercase text-slate-400 font-bold mb-1">Last Updated</p>
-                    <p id="updateText" class="text-sm italic text-yellow-400">Just Now</p>
-                </div>
-            </div>
-            
-            <div class="mt-6 pt-6 border-t border-white/10">
-                <p class="text-xs uppercase text-slate-400 font-bold mb-1 text-center">Current Location</p>
-                <h3 id="locationText" class="text-lg font-medium text-center text-slate-200"></h3>
-            </div>
-        </div>
-    </header>
+  <div class="max-w-md mx-auto flex bg-white p-2 rounded-2xl">
+    <input
+      id="input"
+      type="text"
+      placeholder="Enter Tracking ID"
+      class="flex-grow p-4 text-slate-900 outline-none rounded-l-xl font-mono"
+    >
+    <button
+      onclick="track()"
+      class="bg-blue-600 px-8 py-4 rounded-xl font-bold"
+    >
+      Track
+    </button>
+  </div>
+
+  <div
+    id="res"
+    class="mt-12 max-w-lg mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl text-left hidden border border-white/10"
+  >
+    <div class="track-line">
+      <div id="plane" class="plane">✈️</div>
+      <div class="flex justify-between mt-8 text-[10px] font-bold text-blue-400">
+        <span>ISTANBUL HUB</span>
+        <span>IN TRANSIT</span>
+        <span>GERMANY HUB</span>
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-white/5 pt-6">
+      <p class="text-xs uppercase text-slate-500 font-bold mb-1">Current Status</p>
+      <h3 id="status" class="text-xl font-bold text-green-400 mb-4"></h3>
+
+      <p class="text-xs uppercase text-slate-500 font-bold mb-1">Current Location</p>
+      <h3 id="location" class="text-lg font-medium text-slate-200"></h3>
+    </div>
+  </div>
+</header>
 
 <script>
-const database = {
-    "57536986": { 
-        status: "Departed Istanbul Hub", 
-        location: "Istanbul International Airport (IST)",
-        progress: "25%" // This moves the plane 25% across the bar
-    }
+const shipments = {
+  "57536986": {
+    status: "In Transit",
+    location: "Departed Istanbul Hub — En route to Germany",
+    progress: 30
+  },
+  "77551234": {
+    status: "Arrived at Destination Country",
+    location: "Frankfurt International Hub",
+    progress: 60
+  },
+  "99881221": {
+    status: "Out for Delivery",
+    location: "Berlin Local Distribution Hub",
+    progress: 85
+  }
 };
 
-function runTrack() {
-    const id = document.getElementById('trackInput').value.trim();
-    const box = document.getElementById('resultBox');
-    const status = document.getElementById('statusText');
-    const loc = document.getElementById('locationText');
-    const plane = document.getElementById('planeIcon');
+function track() {
+  const id = document.getElementById("input").value.trim();
+  const res = document.getElementById("res");
+  const plane = document.getElementById("plane");
 
-    if (database[id]) {
-        box.classList.remove('hidden');
-        status.innerText = database[id].status;
-        loc.innerText = database[id].location;
-        status.style.color = "#4ade80"; 
-        
-        // Triggers the plane animation
-        setTimeout(() => {
-            plane.style.left = database[id].progress;
-        }, 100);
-        
-    } else {
-        box.classList.remove('hidden');
-        status.innerText = "Invalid ID";
-        loc.innerText = "Please verify your tracking number.";
-        status.style.color = "#f87171";
-        plane.style.left = "0%";
-    }
+  if (!shipments[id]) {
+    alert("Tracking ID not found");
+    return;
+  }
+
+  const data = shipments[id];
+
+  document.getElementById("status").innerText = data.status;
+  document.getElementById("location").innerText = data.location;
+
+  res.classList.remove("hidden");
+  plane.style.left = "0%";
+
+  setTimeout(() => {
+    plane.style.left = data.progress + "%";
+  }, 200);
 }
 </script>
+
 </body>
 </html>
