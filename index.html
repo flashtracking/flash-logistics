@@ -3,48 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flash Tracking | International</title>
+<title>Flash Tracking Service | Istanbul-Germany</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white font-sans">
-    <nav class="p-6 border-b border-white/10 flex justify-between items-center">
-        <div class="text-2xl font-black italic text-blue-500 uppercase">Flash Tracking</div>
+<body class="bg-[#0a0f1d] font-sans text-white">
+
+    <nav class="p-6 border-b border-white/10">
+        <div class="text-2xl font-black italic text-blue-500 uppercase tracking-tighter">Flash Tracking</div>
     </nav>
+
     <header class="py-20 px-6 text-center">
         <h1 class="text-4xl font-extrabold mb-4">Track Your Shipment</h1>
-        <p class="text-slate-400 mb-10 text-sm italic font-mono">Istanbul, TR ➔ Germany, DE</p>
+        <p class="text-slate-400 mb-10 text-sm tracking-widest">Istanbul, TR ➔ Germany, DE</p>
+        
         <div class="max-w-md mx-auto flex bg-white p-2 rounded-2xl shadow-2xl">
             <input id="trackInput" type="text" placeholder="Enter ID (57536986)" class="flex-grow p-4 text-slate-900 outline-none rounded-l-xl font-mono">
-            <button onclick="runTrack()" class="bg-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-500 transition">Track</button>
+            <button onclick="runTrack()" class="bg-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg">Track</button>
         </div>
-        <div id="resultBox" class="mt-10 max-w-lg mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl text-left hidden border border-white/10">
-            <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Status</p>
-            <h3 id="statusText" class="text-2xl font-bold mb-6 text-green-400"></h3>
-            <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Location</p>
-            <h3 id="locationText" class="text-lg font-medium text-slate-200"></h3>
+
+        <div id="resultBox" class="mt-10 max-w-lg mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl text-left hidden border border-white/10 shadow-2xl">
+            <div class="mb-6">
+                <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Status</p>
+                <h3 id="statusText" class="text-2xl font-bold"></h3>
+            </div>
+            <div>
+                <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Location</p>
+                <h3 id="locationText" class="text-lg font-medium text-slate-200"></h3>
+            </div>
         </div>
     </header>
+
 <script>
+// DATABASE FOR ISTANBUL TO GERMANY ROUTE
 const database = {
     "57536986": { 
         status: "Departed Istanbul Hub", 
         location: "Istanbul International Airport (IST)" 
     }
 };
+
 function runTrack() {
     const id = document.getElementById('trackInput').value.trim();
     const box = document.getElementById('resultBox');
     const status = document.getElementById('statusText');
     const loc = document.getElementById('locationText');
+
     if (database[id]) {
+        // Only show the box if the ID matches
         box.classList.remove('hidden');
         status.innerText = database[id].status;
         loc.innerText = database[id].location;
+        status.style.color = "#4ade80"; // Green for success
     } else {
+        // Show error if ID is wrong
         box.classList.remove('hidden');
         status.innerText = "Invalid ID";
-        status.className = "text-2xl font-bold mb-6 text-red-500";
-        loc.innerText = "Please verify your tracking number.";
+        loc.innerText = "No shipment found with this ID.";
+        status.style.color = "#f87171"; // Red for error
     }
 }
 </script>
