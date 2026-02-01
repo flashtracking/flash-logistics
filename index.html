@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flash Tracking Service | Istanbul-Germany</title>
+<title>Flash Tracking | Istanbul-Germany</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Plane Animation Styling */
+    .plane-track { height: 4px; background: rgba(255,255,255,0.1); position: relative; border-radius: 10px; margin: 40px 0; }
+    .plane { 
+        position: absolute; top: -15px; left: 0%; 
+        transition: left 3s ease-in-out; 
+        font-size: 24px; filter: drop-shadow(0 0 5px #3b82f6);
+    }
+</style>
 </head>
 <body class="bg-[#0a0f1d] font-sans text-white">
 
@@ -12,9 +21,9 @@
         <div class="text-2xl font-black italic text-blue-500 uppercase tracking-tighter">Flash Tracking</div>
     </nav>
 
-    <header class="py-20 px-6 text-center">
+    <header class="py-16 px-6 text-center">
         <h1 class="text-4xl font-extrabold mb-4">Track Your Shipment</h1>
-        <p class="text-slate-400 mb-10 text-sm tracking-widest">Istanbul, TR ➔ Germany, DE</p>
+        <p class="text-slate-400 mb-10 text-sm tracking-widest uppercase">Istanbul (TR) ➔ Germany (DE)</p>
         
         <div class="max-w-md mx-auto flex bg-white p-2 rounded-2xl shadow-2xl">
             <input id="trackInput" type="text" placeholder="Enter ID (57536986)" class="flex-grow p-4 text-slate-900 outline-none rounded-l-xl font-mono">
@@ -22,23 +31,40 @@
         </div>
 
         <div id="resultBox" class="mt-10 max-w-lg mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl text-left hidden border border-white/10 shadow-2xl">
-            <div class="mb-6">
-                <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Status</p>
-                <h3 id="statusText" class="text-2xl font-bold"></h3>
+            
+            <div class="plane-track">
+                <div id="planeIcon" class="plane">✈️</div>
+                <div class="flex justify-between mt-6 text-[10px] font-bold uppercase text-blue-400 tracking-widest">
+                    <span>Istanbul</span>
+                    <span>In Transit</span>
+                    <span>Germany</span>
+                </div>
             </div>
-            <div>
-                <p class="text-xs uppercase text-blue-400 font-bold tracking-widest mb-1">Current Location</p>
-                <h3 id="locationText" class="text-lg font-medium text-slate-200"></h3>
+
+            <div class="grid grid-cols-2 gap-4 mt-10">
+                <div>
+                    <p class="text-xs uppercase text-slate-400 font-bold mb-1">Status</p>
+                    <h3 id="statusText" class="text-lg font-bold"></h3>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-slate-400 font-bold mb-1">Last Updated</p>
+                    <p id="updateText" class="text-sm italic text-yellow-400">Just Now</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-white/10">
+                <p class="text-xs uppercase text-slate-400 font-bold mb-1 text-center">Current Location</p>
+                <h3 id="locationText" class="text-lg font-medium text-center text-slate-200"></h3>
             </div>
         </div>
     </header>
 
 <script>
-// DATABASE FOR ISTANBUL TO GERMANY ROUTE
 const database = {
     "57536986": { 
         status: "Departed Istanbul Hub", 
-        location: "Istanbul International Airport (IST)" 
+        location: "Istanbul International Airport (IST)",
+        progress: "25%" // This moves the plane 25% across the bar
     }
 };
 
@@ -47,19 +73,25 @@ function runTrack() {
     const box = document.getElementById('resultBox');
     const status = document.getElementById('statusText');
     const loc = document.getElementById('locationText');
+    const plane = document.getElementById('planeIcon');
 
     if (database[id]) {
-        // Only show the box if the ID matches
         box.classList.remove('hidden');
         status.innerText = database[id].status;
         loc.innerText = database[id].location;
-        status.style.color = "#4ade80"; // Green for success
+        status.style.color = "#4ade80"; 
+        
+        // Triggers the plane animation
+        setTimeout(() => {
+            plane.style.left = database[id].progress;
+        }, 100);
+        
     } else {
-        // Show error if ID is wrong
         box.classList.remove('hidden');
         status.innerText = "Invalid ID";
-        loc.innerText = "No shipment found with this ID.";
-        status.style.color = "#f87171"; // Red for error
+        loc.innerText = "Please verify your tracking number.";
+        status.style.color = "#f87171";
+        plane.style.left = "0%";
     }
 }
 </script>
