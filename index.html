@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash Tracking Service</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans">
+<nav class="p-5 bg-white shadow-sm flex justify-between items-center">
+<div class="text-2xl font-black italic text-blue-700">FLASH<span class="text-slate-800">TRACKING</span></div>
+</nav>
+<header class="bg-blue-900 text-white py-20 px-6 text-center">
+<h1 class="text-4xl font-bold mb-6">Real-Time Tracking</h1>
+<div class="max-w-md mx-auto flex bg-white p-2 rounded-xl">
+<input id="ftsInput" type="text" placeholder="Enter ID (e.g. FTS-101)" class="flex-grow p-3 text-slate-900 outline-none">
+<button onclick="track()" class="bg-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-blue-500 transition">Track</button>
+</div>
+<div id="display" class="mt-8 p-4 rounded-xl bg-white/10 hidden">
+<p class="text-sm uppercase tracking-widest opacity-70">Parcel Status</p>
+<h3 id="statusText" class="text-2xl font-bold"></h3>
+</div>
+</header>
+<script>
+const database = {"FTS-101": "In Akure Hub", "FTS-102": "Out for Delivery", "FTS-103": "Delivered"};
+function track() {
+const id = document.getElementById('ftsInput').value.toUpperCase();
+const box = document.getElementById('display');
+const text = document.getElementById('statusText');
+box.classList.remove('hidden');
+text.innerText = database[id] ? database[id] : "Tracking ID Not Found";
+}
+</script>
+</body>
+</html>
